@@ -1,0 +1,72 @@
+\documentclass{jsarticle}
+\usepackage{multicol}
+
+% sourcecode highlight
+\usepackage{color}
+\usepackage{listings,jlisting}
+
+%jlisting (sourcecode highlight)
+\lstset{
+language={C},
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small \color[rgb]{0,0,0}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+
+\title{麻雀点数計算プログラム\ 注釈書}
+\author{14EC004\ 飯田頌平}
+
+\begin{document}
+\maketitle
+
+\begin{multicols}{2}
+
+\section{はじめに}
+本稿は吉田さんの麻雀点数計算プログラム\cite{yoshida}
+の注釈書にあたる。
+
+このプログラムはカメラで麻雀の手牌を撮影すると
+点数を自動で計算するというものであり、
+大まかにサーバ、画像認識、点数計算の三つのモジュールに分かれている。
+
+このうち本稿では画像認識の部分について触れる。
+画像認識の実装ファイルTemplateMatching.scalaを付録に掲載するので、参考にしながら読むこと。
+
+\section{画像認識のフロー}
+
+画像認識はパターンマッチングによって行われている。
+よって、最初に訓練データからテンプレートを生成し、その後テストデータとテンプレートを照合させて結果を求める。
+まずはテンプレートの生成手順を示す。
+\begin{enumerate}
+\item 雀牌群と背景を判別し、雀牌群だけを切り取る
+\item 雀牌群を黒と白で二値化する
+\item 雀牌群から雀牌ひとつあたりの縦幅と横幅を求める
+\item 白と判別された誤差（牌の隅）を黒く塗りつぶす
+\end{enumerate}
+
+%\begin{lstlisting}[caption=RaspiAudio/voice/lowpassFilter.py,label=filter]
+%
+%\end{lstlisting}
+
+\begin{thebibliography}{9}
+\bibitem{yoshida}
+	Sanshiro Yoshida．mahjongs．\\
+	https://github.com/halcat0x15a/mahjongs
+\end{thebibliography}
+
+\end{multicols}
+\end{document}
