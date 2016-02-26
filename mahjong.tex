@@ -119,6 +119,12 @@ warpAffineで矩形の傾きを底面と垂直になるよう修正し、
 getRectSubPixで矩形領域のピクセル値を得ることで、
 入力画像を輪郭毎に分離した上で補正をかけた画像を得るようになっている。
 
+白と黒で二値化されたテンプレート画像は、
+牌の集合の縁は白、背景は黒と別の色で分けられているため、
+findCountoursによって輪郭を得られるようになっている。
+得た輪郭countourのメソッドtoArrayを用いれば、
+minAreaRectで矩形を引くべき座標を得られるのである。
+
 こうして得られた分離後の画像のシーケンス（返り値はBuffer型であることに注意）から
 headOptionを使うことで先頭要素を取り出せる。
 findContoursでは大きさ順に画像をソートする作用があるので、
@@ -187,6 +193,12 @@ goの内部では、まず各テンプレートに対してOpenCVのテンプレ
 minMaxLocを通して最もスコアの高い位置を取得し、
 テンプレートと位置のタプルをlocsに加えてゆく。
 この手順をすべてのテンプレートに対して実行する。
+matchTemplateでマッチングを行い、
+最大スコアをminMaxLocで取得するという一連の流れは、
+OpenCVによるテンプレートマッチングの基本的な流れである。
+minMaxLocの返り値は複雑であるが、ドキュメントに記載されている\cite{minMaxLoc}通り
+Core.MinMaxLocResult型である。
+プログラムでは座標を返すmaxLocフィールドと値を返すmaxValフィールドを参照する。
 
 %疑問提起
 \begin{comment}
@@ -198,7 +210,35 @@ val ((tile, loc), i) = locs.zipWithIndex.maxBy(_._1._2.mavVal)
 だとしたらval locs= { ... }
 の処理が毎回呼ばれる分処理に問題がないか？
 \end{comment}
+%解答
+\begin{comment}
+goのループで読んでいる。
+処理は大変重たい。
+しかしminMaxLocの関数の仕様上、
+matchTemplate -> minMaxLocという
+openCVのマッチングの流れ上、
+仕方のない話なのである。
+\end{comment}
 
+すべてのテンプレート（及びその回転）に対してのマッチングの結果locsから、
+loc値が最大となるものをmaxByによって取得し、変数((tile,loc),i)に代入する。
+スコアが最大となる位置はloc.maxLocで参照でき、
+それにテンプレートの大きさtile.sizeを組み合わせることで、
+マッチした手牌の輪郭rectを得られる。
+
+ここでgoの引数を見てみる。
+goの引数はrectsであり、
+それはrectと、そのインデックス番号のタプルのシーケンスである。
+goは再帰を前提としており、このシーケンスrectsは再帰のたびに認識結果を積み重ねてゆく。
+
+rectを得たあと、引数のrectsについて、
+
+%疑問
+\begin{comment}
+・43行目case(hand,contour) if hand.size.area>0の意味
+・pair => !intersects ...　の処理がわからない
+・rectangle？矩形を描く？Imgproc.rectangleが見つからない...
+\end{comment}
 
 
 %\begin{lstlisting}[caption=,label=]
@@ -209,6 +249,9 @@ val ((tile, loc), i) = locs.zipWithIndex.maxBy(_._1._2.mavVal)
 \bibitem{yoshida}
 	Sanshiro Yoshida．mahjongs．\\
 	https://github.com/halcat0x15a/mahjongs
+\bibitem{minMaxLoc}
+	OpenCV 2．4．2 Java API．Core．MinMaxLocResult．\\
+	http://docs.opencv.org/java/2.4.2/index.html?org/opencv/core/Core.html
 \end{thebibliography}
 
 \end{multicols}
