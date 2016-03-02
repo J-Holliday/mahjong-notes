@@ -52,6 +52,36 @@ morecomment=[l]{//}
 およびユーザ定義関数の実装ファイルpackage.scala
 を付録に掲載するので、参考にしながら読むこと。
 
+\section{プログラムの実行方法}
+
+プログラムはgithub上に上げられているが、
+それをcloneするだけでは動作しない。
+sbtをインストールした上で、opencvを使用できるようにせねばならない。
+
+Ubuntuであれば、sbtは以下のコマンドでインストールできる。
+\begin{lstlisting}[caption=sbt,label=sbt]
+$ sudo apt-get install sbt
+\end{lstlisting}
+
+opencvは各自自力でコンパイルする必要がある。
+公式ドキュメントを参考にして、以下のコマンドを実行して.soファイルを生成する。
+\begin{lstlisting}[caption=opencv,label=opencv]
+$ git clone git://github.com/Itseez/opencv.git
+$ cd opencv
+$ mkdir build
+$ cd build
+$ cmake -DBUILD_SHARED_LIBS=OFF
+$ make -j8
+\end{lstlisting}
+
+.soファイルはopencv/build/libに生成されるはずである。
+もし生成されていない場合は、cmakeの出力結果を確認すること。
+To\ be\ builtの項目にjavaとない場合は、java-8-oracleの環境変数を設定できていないので、
+\begin{lstlisting}[caption=JAVAHOME,label=j]
+$ JAVA_HOME=/usr/lib/jvm/java-8-oracle
+\end{lstlisting}
+を実行すること。
+
 \section{画像認識のフロー}
 
 画像認識はパターンマッチングによって行われている。
@@ -187,7 +217,7 @@ collectはfilterとmapを合わせたような関数
 条件文はcase(hand,contour) if hand.size.area>0
 だがこれでは何の条件判定をしているのか？
 \end{comment}
-
+	
 goの内部では、まず各テンプレートに対してOpenCVのテンプレートマッチング関数たるmatchTemplateを呼ぶ。
 その結果がresultへと代入されるので、
 minMaxLocを通して最もスコアの高い位置を取得し、
@@ -231,8 +261,6 @@ goの引数はrectsであり、
 それはrectと、そのインデックス番号のタプルのシーケンスである。
 goは再帰を前提としており、このシーケンスrectsは再帰のたびに認識結果を積み重ねてゆく。
 
-rectを得たあと、引数のrectsについて、
-
 %疑問
 \begin{comment}
 ・43行目case(hand,contour) if hand.size.area>0の意味
@@ -240,6 +268,23 @@ rectを得たあと、引数のrectsについて、
 ・rectangle？矩形を描く？Imgproc.rectangleが見つからない...
 \end{comment}
 
+rectangleによってマッチングした牌の輪郭部分に矩形を描くと、
+goを再帰する。
+このときシーケンスである引数rectsにマッチした牌rectを加えており、
+rectsはすべての牌についてのマッチングが終了した時には関数goの返り値となる。
+
+%疑問
+\begin{comment}
+・sortby(_._2.x)のxは何を指しているのか？
+・map(_._1)は何を実行しているのか？
+\end{comment}
+
+\section{疑問点一覧}
+\begin{itemize}
+\item l63,indices.sizeについて、このカッコで囲んだ文一覧について
+\item groupByについて、mapValuesについて
+\item 
+\end{itemize}
 
 %\begin{lstlisting}[caption=,label=]
 %
