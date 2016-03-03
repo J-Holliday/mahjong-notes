@@ -30,6 +30,10 @@ morecomment=[l]{//}
 %comment out multiple line
 \usepackage{comment}
 
+%image
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{here}
+
 
 \title{麻雀点数計算プログラム\ 注釈書}
 \author{14EC004\ 飯田頌平}
@@ -81,6 +85,10 @@ To\ be\ builtの項目にjavaとない場合は、java-8-oracleの環境変数�
 $ JAVA_HOME=/usr/lib/jvm/java-8-oracle
 \end{lstlisting}
 を実行すること。
+
+生成された.soファイルを、cloneしてきたmahjongsディレクトリの下の
+mahjongs/recogniser/lib
+に置けばsbt環境下でopencvを使用することができるようになる。
 
 \section{画像認識のフロー}
 
@@ -279,16 +287,89 @@ rectsはすべての牌についてのマッチングが終了した時には関
 ・map(_._1)は何を実行しているのか？
 \end{comment}
 
+%疑問
+\begin{comment}
 \section{疑問点一覧}
 \begin{itemize}
 \item l63,indices.sizeについて、このカッコで囲んだ文一覧について
 \item groupByについて、mapValuesについて
 \item 
 \end{itemize}
+\end{comment}
+
+\section{matchTemplateについて}
+
+opencvにおけるテンプレートマッチングを行うメソッドmatchTemplateは、以下の引数を取る。
+\begin{enumerate}
+\item image,\ テンプレートの探索対象となる画像。8ビットまたは32ビットの浮動小数点型
+\item templ,\ 探索されるテンプレート。imageと同じデータ型である必要がある
+\item result,\ 比較結果のマップ
+\item method,\ 比較方法の指定
+\end{enumerate}
+
+プログラムではmethodにTM\_CCORR\_NORMEDを指定している。
+これは数式で表すと
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/ccorr.png}
+    \caption{相互相関関数}
+    \label{fig:ccorr}
+  \end{center}
+\end{figure}
+であり、一般に相互相関関数と呼ばれる式である。
+
+この式の意味するところは、テンプレートと対象画像の内積である。
+相互相関関数の式の左辺をcosθに、右辺を内積とゲインの商だと見れば、
+まさしくベクトルの内積を示していることがわかる。
+相互相関関数の左辺は内積の角度cosθを示しており、
+cosθが１に近づけば近づくほど、θは小さく、テンプレートと対象画像の領域が近づいていることを意味する。
+
+各ピクセルに対して内積を求める操作は行われ、その総和を以ってスコアとするので、
+スコアが大きければ大きいほど、テンプレートとマッチしているという結果になる。
+この点は最小誤差によってマッチングを行うmethodSQDIFFとは逆の意味になっているので、
+関数matchTemplateの結果resultには注意が必要である。
+
+matchTemplateの結果であるresultについては、スコアのマップ形式で返される。
+マップについて説明する。
+そもそもテンプレートマッチングとは、
+テンプレート画像と対象画像を重ね合わせて画素の差を比較するという行為を、
+各ピクセルに対して行うものである。
+つまり重ねあわせが行われる範囲でマッチングの結果が得られるのであって、
+それは対象画像のサイズとテンプレート画像のサイズの差の範囲である。
+この範囲の行列をマップと呼ぶ。（この呼び名はopencvのドキュメント\cite{matchTemplateC}\cite{matchTemplatePy}に即する）
+そしてマップの値にはテンプレートマッチングのスコア（相互相関関数の値）が入るのである。
+
+この理論は実際に画像を用意してmatchTemplateを行い、元画像・テンプレート画像のサイズとマップのサイズを比較すれば裏付けられる。
+マップのサイズは縦横ともに元画像とテンプレート画像の差に等しい結果が得られる。
+そしてこの結果を画像形式に落とし込んだものが、吉田さんの梗概集の図5に示されたマッチング結果である。
+マップの値たる相互相関関数の結果は、0から1の範囲で表されているため、
+そのままopencvの出力関数を使うと一面真っ黒な画像（図\ref{fig:res}）が得られてしまうが、
+255を乗ずることで、opencv標準の0から255までの範囲での画素の表現に対応するようになるため、
+吉田さんのマッチング結果のような、縞模様状の結果（図\ref{fig:res2}）を得ることができる。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/res.png}
+    \caption{相互相関関数出力結果1}
+    \label{fig:res}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/res2.png}
+    \caption{相互相関関数出力結果2}
+    \label{fig:res2}
+  \end{center}
+\end{figure}
 
 %\begin{lstlisting}[caption=,label=]
 %
 %\end{lstlisting}
+
+\end{multicols}
+
+\newpage
 
 \begin{thebibliography}{9}
 \bibitem{yoshida}
@@ -297,9 +378,15 @@ rectsはすべての牌についてのマッチングが終了した時には関
 \bibitem{minMaxLoc}
 	OpenCV 2．4．2 Java API．Core．MinMaxLocResult．\\
 	http://docs.opencv.org/java/2.4.2/index.html?org/opencv/core/Core.html
+\bibitem{matchTemplateC}
+	物体検出－opencv2.2 documentation． \\
+	http://opencv.jp/opencv-2svn/cpp/object\_detection.html
+\bibitem{matchTemplatePy}
+	Object Detection－opencv2.4.10．\\
+	http://docs.opencv.org/2.4/modules/imgproc/doc/object\_detection.html
 \end{thebibliography}
 
-\end{multicols}
+
 
 \begin{comment}
 \newpage

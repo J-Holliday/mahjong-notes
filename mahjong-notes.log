@@ -1,11 +1,11 @@
-This is e-pTeX, Version 3.14159265-p3.7-150805-2.6 (utf8.sjis) (TeX Live 2015/W32TeX) (preloaded format=platex 2015.11.21)  2 MAR 2016 19:58
+This is e-pTeX, Version 3.14159265-p3.5-130605-2.6 (utf8.sjis) (TeX Live 2014/W32TeX) (preloaded format=platex 2014.5.8)  3 MAR 2016 20:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./mahjong-notes.tex
+**mahjong-notes.tex
 (./mahjong-notes.tex
-pLaTeX2e <2006/11/10> (based on LaTeX2e <2015/10/01> patch level 2)
-Babel <3.9m> and hyphenation patterns for 79 languages loaded.
+pLaTeX2e <2006/11/10> (based on LaTeX2e <2014/05/01> patch level 0)
+Babel <3.9k> and hyphenation patterns for 78 languages loaded.
 (c:/w32tex/share/texmf-dist/tex/platex/jsclasses/jsarticle.cls
 Document Class: jsarticle 2014/02/07 okumura
 LaTeX Info: Redefining \rmfamily on input line 352.
@@ -42,7 +42,7 @@ LaTeX Info: Redefining \LaTeX on input line 1757.
 LaTeX Info: Redefining \LaTeXe on input line 1782.
 \heisei=\count89
 ) (c:/w32tex/share/texmf-dist/tex/latex/tools/multicol.sty
-Package: multicol 2015/08/19 v1.8n multicolumn formatting (FMi)
+Package: multicol 2014/04/23 v1.8e multicolumn formatting (FMi)
 \c@tracingmulticols=\count90
 \mult@box=\box42
 \multicol@leftmargin=\dimen122
@@ -91,22 +91,22 @@ Package: multicol 2015/08/19 v1.8n multicolumn formatting (FMi)
 \mc@col@check@num=\count98
 )
 (c:/w32tex/share/texmf-dist/tex/latex/graphics/color.sty
-Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
+Package: color 2014/04/23 v1.1a Standard LaTeX Color (DPC)
 
 (c:/w32tex/share/texmf-dist/tex/latex/config/color.cfg
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
-Package color Info: Driver file: dvips.def on input line 142.
+Package color Info: Driver file: dvips.def on input line 137.
 
 (c:/w32tex/share/texmf-dist/tex/latex/graphics/dvips.def
-File: dvips.def 2014/10/14 v3.0j Driver-dependent file (DPC,SPQR)
+File: dvips.def 2014/04/23 v3.0j Driver-dependant file (DPC,SPQR)
 )
 (c:/w32tex/share/texmf-dist/tex/latex/graphics/dvipsnam.def
-File: dvipsnam.def 2014/10/14 v3.0j Driver-dependent file (DPC,SPQR)
+File: dvipsnam.def 2014/04/23 v3.0j Driver-dependant file (DPC,SPQR)
 ))
 (c:/w32tex/share/texmf-dist/tex/latex/listings/listings.sty
 (c:/w32tex/share/texmf-dist/tex/latex/graphics/keyval.sty
-Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+Package: keyval 2014/05/08 v1.15 key=value parser (DPC)
 \KV@toks@=\toks15
 )
 \lst@mode=\count99
@@ -123,157 +123,166 @@ Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \lst@maxwidth=\dimen134
 
 (c:/w32tex/share/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+File: lstmisc.sty 2014/03/04 1.5c (Carsten Heinz)
 \c@lstnumber=\count105
 \lst@skipnumbers=\count106
 \lst@framebox=\box69
 )
 (c:/w32tex/share/texmf-dist/tex/latex/listings/listings.cfg
-File: listings.cfg 2015/06/04 1.6 listings configuration
+File: listings.cfg 2014/03/04 1.5c listings configuration
 ))
-Package: listings 2015/06/04 1.6 (Carsten Heinz)
+Package: listings 2014/03/04 1.5c (Carsten Heinz)
 
-(c:/w32tex/share/texmf-dist/tex/latex/listing/jlisting.sty
+(c:/w32tex/share/texmf-dist/tex/latex/jlisting/jlisting.sty
 Package: jlisting 2006/02/20 0.2 (Thor)
 \lst@nextchar=\count107
 \lst@inputfile=\read1
 )
 (c:/w32tex/share/texmf-dist/tex/latex/listings/lstlang1.sty
-File: lstlang1.sty 2015/06/04 1.6 listings language file
+File: lstlang1.sty 2014/03/04 1.5c listings language file
 )
 (c:/w32tex/share/texmf-dist/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+File: lstmisc.sty 2014/03/04 1.5c (Carsten Heinz)
 )
 (c:/w32tex/share/texmf-dist/tex/latex/comment/comment.sty
 \CommentStream=\write3
 
 Excluding comment 'comment')
-No file mahjong-notes.aux.
+(c:/w32tex/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/04/25 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(c:/w32tex/share/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(c:/w32tex/share/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(c:/w32tex/share/texmf-dist/tex/latex/config/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: dvipdfmx.def on input line 91.
+
+(c:/w32tex/share/texmf-dist/tex/latex/graphics/dvipdfmx.def
+File: dvipdfmx.def 2014/04/28 v4.01 LaTeX color/graphics driver for dvipdfmx (T
+eX Live/ChoF)
+))
+\Gin@req@height=\dimen135
+\Gin@req@width=\dimen136
+)
+(c:/w32tex/share/texmf-dist/tex/latex/here/here.sty)
+(c:/w32tex/share/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count108
+\float@exts=\toks17
+\float@box=\box70
+\@float@everytoks=\toks18
+\@floatcapt=\box71
+) (./mahjong-notes.aux)
 \openout1 = `mahjong-notes.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-\c@lstlisting=\count108
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 41.
+LaTeX Font Info:    ... okay on input line 41.
+\c@lstlisting=\count109
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 16.60605pt on input line 38.
+(Font)              scaled to size 16.60605pt on input line 42.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 16.60605pt on input line 38.
+(Font)              scaled to size 16.60605pt on input line 42.
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 38.
+(Font)              scaled to size 11.53198pt on input line 42.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 38.
+(Font)              scaled to size 11.53198pt on input line 42.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 38.
+(Font)              <12> on input line 42.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 38.
+(Font)              <8> on input line 42.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 38.
+(Font)              <6> on input line 42.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 5.76599pt on input line 38.
+(Font)              scaled to size 5.76599pt on input line 42.
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 13.83836pt on input line 42.
+(Font)              scaled to size 13.83836pt on input line 46.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 13.83836pt on input line 42.
+(Font)              scaled to size 13.83836pt on input line 46.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 13.83836pt on input line 42.
+(Font)              scaled to size 13.83836pt on input line 46.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 13.83836pt on input line 42.
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 43.
+(Font)              scaled to size 13.83836pt on input line 46.
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 66.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 66.
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 6.72699pt on input line 67.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 6.72699pt on input line 67.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 67.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 67.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 4.805pt on input line 67.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 43.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 43.
+(Font)              scaled to size 8.64899pt on input line 73.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 43.
+(Font)              scaled to size 8.64899pt on input line 73.
 
-LaTeX Warning: Citation `yoshida' on page 1 undefined on input line 43.
-
-LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 62.
-LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 62.
-LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 63.
-LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 6.72699pt on input line 63.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 63.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 63.
-LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 4.805pt on input line 63.
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 69.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 69.
 [1
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 119.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 127.
 
  (c:/w32tex/share/texmf-dist/tex/latex/base/omscmr.fd
-File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 119.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 127.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 132.
+(Font)              <7> on input line 140.
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 5.76599pt on input line 132.
+(Font)              scaled to size 5.76599pt on input line 140.
 
 
 Package multicol Warning: I moved some lines to the next page.
-(multicol)                Footnotes on page 2 might be wrong on input line 178.
+(multicol)                Footnotes on page 2 might be wrong on input line 186.
 
 
-[2] Excluding 'comment' comment.
-
-LaTeX Warning: Citation `minMaxLoc' on page 3 undefined on input line 229.
-
+[2] Excluding 'comment' comment. Excluding 'comment' comment.
 Excluding 'comment' comment. Excluding 'comment' comment.
-Excluding 'comment' comment. Excluding 'comment' comment.
-Underfull \hbox (badness 10000) in paragraph at lines 298--300
-[]\OT1/cmr/m/n/10 OpenCV 2\JY1/mc/m/n/10 ． \OT1/cmr/m/n/10 4\JY1/mc/m/n/10 ． 
-\OT1/cmr/m/n/10 2 Java API\JY1/mc/m/n/10 ． \OT1/cmr/m/n/10 Core\JY1/mc/m/n/10 
-． \OT1/cmr/m/n/10 Min-
+Excluding 'comment' comment. Excluding 'comment' comment. [3]
+File: ./img/ccorr.png Graphic file (type bmp)
+
+<./img/ccorr.png>
+Overfull \hbox (10.90515pt too wide) in paragraph at lines 310--318
+[]\JY1/mc/m/n/10 プログラムでは \OT1/cmr/m/n/10 method \JY1/mc/m/n/10 に \OT1/c
+mr/m/n/10 TM[]CCORR[]NORMED
  []
 
-
-Overfull \hbox (123.87836pt too wide) in paragraph at lines 298--300
-[]\OT1/cmr/m/n/10 http://docs.opencv.org/java/2.4.2/index.html?org/opencv/core/
-Core.html 
- []
-
-[3] Excluding 'comment' comment. [4] (./mahjong-notes.aux)
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+File: ./img/res.png Graphic file (type bmp)
+<./img/res.png>
+File: ./img/res2.png Graphic file (type bmp)
+ <./img/res2.png> [4] Excluding 'comment' comment. [5]
+(./mahjong-notes.aux) ) 
 Here is how much of TeX's memory you used:
- 2284 strings out of 493734
- 31727 string characters out of 6152926
- 144660 words of memory out of 5000000
- 5834 multiletter control sequences out of 15000+600000
- 15554 words of font info for 70 fonts, out of 8000000 for 9000
+ 2577 strings out of 493807
+ 35629 string characters out of 6153780
+ 143047 words of memory out of 5000000
+ 6033 multiletter control sequences out of 15000+600000
+ 14973 words of font info for 67 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 27i,8n,49p,199b,1226s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 27i,8n,49p,210b,1226s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on mahjong-notes.dvi (4 pages, 22080 bytes).
+Output written on mahjong-notes.dvi (5 pages, 27960 bytes).
