@@ -96,23 +96,27 @@ mahjongs/recogniser/lib
 よって、最初に訓練データからテンプレートを生成し、その後テストデータとテンプレートを照合させて結果を求める。
 まずはテンプレートの生成手順を示す。
 \begin{enumerate}
-\item 雀牌と背景を判別し、雀牌だけを切り取る
 \item 雀牌を黒と白で二値化する
+\item 雀牌の輪郭を判別し、雀牌だけを切り取る
 \item 雀牌から牌ひとつあたりの縦幅と横幅を求める
 \item 白と判別された誤差（牌の隅）を黒く塗りつぶす
-\item 雀牌から牌のシーケンスを抽出する
-\item 雀牌の絵柄部分の輪郭を得る
-\item 雀牌のグレースケールからテンプレートを生成する
+\item 牌の絵柄部分の輪郭情報を得る
+\item 輪郭情報と雀牌のグレースケール画像からテンプレートを生成する
 \end{enumerate}
 
 詳細な説明については後述するとして、
 次に照合の手順を示す。
 \begin{enumerate}
-\item 手牌と背景を区別し、手牌だけを切り取る
+\item 手牌の輪郭を判別し、手牌（純手牌＋鳴牌）だけを切り取る
+\item テンプレートと同じサイズにリサイズする
+\item 取得した輪郭の頂点数を求める（四角形なら純手牌である）
 \item テンプレートから各牌を回転させたイメージを得る
-\item 手牌とテンプレート（及び回転イメージ）を照合させ、座標の形で一致箇所を得る
-\item 座標を基に手牌を判定する
-\item 門前か否かを判定する
+\item 手牌とテンプレート（及び回転イメージ）をテンプレートマッチングで照合する
+\item 照合結果に牌種のシーケンスを与え、結果の最大スコアを取り出す
+\item 最大スコアを基に矩形を作成し、手牌を矩形領域で塗りつぶす
+\item ５．６．７．の手順を再帰的に繰り返すと、手牌が黒く塗りつぶされてゆく。
+		  完全に塗りつぶされたら、再帰を終了する
+\item 純手牌を第一要素、鳴牌を第二要素のタプルを作り、関数の結果として返す
 \end{enumerate}
 
 こうして手牌を認識することができた。
@@ -124,13 +128,12 @@ mahjongs/recogniser/lib
 まずは元画像を用意する。
 以下にその要件を示す。
 \begin{itemize}
-\item 雀牌を4*9の矩形上に隙間なく並べる
-\item 牌の位置は固定である \\
+\item 雀牌を4*9の矩形上に隙間なく並べる。矩形は平行になるようにする
+\item 牌の位置は固定である。
 		  一萬からはじまるSEQが予め定められている
-\item 背景は一色のものを選ぶ
 \item 雀牌と背景以外のものを除外する
-\item 背景もできるだけ写り込まないようにする
 \item 撮影時に、各牌が等しい高さと幅を持つよう注意する
+\item 二値化からの境界値探索を阻害しないよう背景を選ぶ
 \end{itemize}
 
 背景には麻雀マットなどを用いれば良い。
@@ -139,6 +142,7 @@ mahjongs/recogniser/lib
 元画像はプログラムへMat型で渡される。
 Mat型はopencv\footnote{https://github.com/bytedeco/javacv}のライブラリが提供する行列の型であり、
 opencvではこの型で画像データを扱う。
+Mat型の内部構造は行列、画素値、画素のデータ型である。
 createTemplateの引数matが元画像のデータを示す変数である。
 
 matに対して最初に行われる処理は、定数MaxResolutionのサイズに近づくよう
@@ -167,7 +171,7 @@ minAreaRectで矩形を引くべき座標を得られるのである。
 headOptionを使うことで先頭要素を取り出せる。
 findContoursでは大きさ順に画像をソートする作用があるので、
 先頭要素には一番大きな画像が入る。
-一番大きな画像が雀牌であるという前提であるなら（元画像の背景部分が大きすぎるとこの前提は崩れる）、
+一番大きな画像が雀牌であるという前提であるなら、
 この先頭要素は雀牌であるため、雀牌のテンプレートは引数templateに束縛される。
 
 thresholdによってテンプレートを黒と白で二値化し、
@@ -183,24 +187,28 @@ widthとheightに牌ひとつあたりの幅と高さを代入する。
 floodFillは座標を指定し、連結部分を指定した色で塗りつぶす関数である。
 これを牌と牌の間にすべてに対して実行することで、
 誤判定が塗りつぶされる。
+floodFillの補完として、dilateを使用する。
+dilateは膨張処理によってノイズを消す効果があり、
+ターゲットの周辺に1ピクセルでも白があれば、ターゲットを白に置き換える処理を行う。
+これによって牌の模様をはっきりとさせる。
 
 そして牌の模様だけを抽出する。
 findContoursによって再び輪郭ごとの分離をかければ、
 模様だけを抽出することができる。
-四筒のように模様が複数に分離されてしまうケースの場合は、
+四筒のように模様が複数に分離されてしまうケース（二筒ふたつとして認識される）の場合は、
 convexHullによって結合する。
+convexHullは点群の凸包を得た後に外接する矩形で近似する。
 最後に、得られた模様の中で、もっとも面積の大きなものをsizeに代入する。
 マッチングを行う際にはこのサイズを基準にするためである。
 
-ここまでで二値化の済んだ雀牌のテンプレート画像が得られた。
-今度はこれを牌ひとつひとつに分離して、牌ごとのテンプレートを得る。
+ここまでで二値化を通して牌の模様の輪郭情報を抽出する処理を行った。
+今度はこれをグレースケール画像に適用し、牌一種類ごとのテンプレートを得る。
 
 それにはgridを用いる。
 gridはsubmatを実装に含み、元画像から矩形範囲を抽出できる関数である。
 gridで牌を4*9に区切り、zipで牌ごとに模様の輪郭の情報を付与し、
 それらにflatMapを挟んでgetRectSubPixをかけることによって、
 輪郭だけが抽出されたすべての牌のテンプレートを得ることができる。
-なお、このテンプレートは白黒ではなくグレースケールである点に注意。
 
 以上でテンプレートの生成が完了した。
 
@@ -212,90 +220,50 @@ gridで牌を4*9に区切り、zipで牌ごとに模様の輪郭の情報を付�
 手牌のデータはcropによって背景から切り離される。
 しかしテンプレートをcropで切り離したときと違い、
 この場合は牌のデータが複数に分かれる。
-手牌には門前と鳴きがあり、鳴いた牌は手牌と離して置くためだ。
+手牌には純手牌と鳴牌があり、鳴牌は純手牌と離して置くためだ。
 
 手牌のデータはcollectによってhandに束縛される。
+handをテンプレートのサイズに合わせてリサイズし、
+頂点数を求め純手牌か否かの情報をedgeに代入して、
 テンプレートに向きを回転させた牌を加えてtilesに代入すると、
 いよいよgoでパターンマッチを行う。
-
-%疑問提起
-\begin{comment}
-collectはfilterとmapを合わせたような関数
-条件を満たした結果のみのシーケンスを作る
-条件文はcase(hand,contour) if hand.size.area>0
-だがこれでは何の条件判定をしているのか？
-\end{comment}
 	
-goの内部では、まず各テンプレートに対してOpenCVのテンプレートマッチング関数たるmatchTemplateを呼ぶ。
+goの内部では、まず各テンプレートに対してopencvのテンプレートマッチング関数たるmatchTemplateを呼ぶ。
 その結果がresultへと代入されるので、
-minMaxLocを通して最もスコアの高い位置を取得し、
-テンプレートと位置のタプルをlocsに加えてゆく。
+minMaxLocを通して最高スコアと最低スコアの情報を取り出し、
+使用したテンプレートとスコア情報のタプルをlocsに加えてゆく。
 この手順をすべてのテンプレートに対して実行する。
-matchTemplateでマッチングを行い、
-最大スコアをminMaxLocで取得するという一連の流れは、
-OpenCVによるテンプレートマッチングの基本的な流れである。
-minMaxLocの返り値は複雑であるが、ドキュメントに記載されている\cite{minMaxLoc}通り
+minMaxLocの返り値はドキュメントによると\cite{minMaxLoc}
 Core.MinMaxLocResult型である。
-プログラムでは座標を返すmaxLocフィールドと値を返すmaxValフィールドを参照する。
-
-%疑問提起
-\begin{comment}
-val ((tile, loc), i) = locs.zipWithIndex.maxBy(_._1._2.mavVal)
-について、
-どうしてひとつのテンプレートの値だけに着目しているのか
-他のテンプレートの値はどうなっている？
-ループで呼ぶのか？
-だとしたらval locs= { ... }
-の処理が毎回呼ばれる分処理に問題がないか？
-\end{comment}
-%解答
-\begin{comment}
-goのループで読んでいる。
-処理は大変重たい。
-しかしminMaxLocの関数の仕様上、
-matchTemplate -> minMaxLocという
-openCVのマッチングの流れ上、
-仕方のない話なのである。
-\end{comment}
+座標を返すmaxLocフィールドと値を返すmaxValフィールドを参照することで最高スコアの情報を得ることができる。
 
 すべてのテンプレート（及びその回転）に対してのマッチングの結果locsから、
 loc値が最大となるものをmaxByによって取得し、変数((tile,loc),i)に代入する。
 スコアが最大となる位置はloc.maxLocで参照でき、
 それにテンプレートの大きさtile.sizeを組み合わせることで、
 マッチした手牌の輪郭rectを得られる。
+rectの実装では、最大スコアの場所とサイズから、基準点と縦横のサイズ情報を持つ矩形を作成している。
 
 ここでgoの引数を見てみる。
 goの引数はrectsであり、
 それはrectと、そのインデックス番号のタプルのシーケンスである。
 goは再帰を前提としており、このシーケンスrectsは再帰のたびに認識結果を積み重ねてゆく。
 
-%疑問
-\begin{comment}
-・43行目case(hand,contour) if hand.size.area>0の意味
-・pair => !intersects ...　の処理がわからない
-・rectangle？矩形を描く？Imgproc.rectangleが見つからない...
-\end{comment}
-
-rectangleによってマッチングした牌の輪郭部分に矩形を描くと、
+rectangleによってマッチングした牌の輪郭部分に矩形を描き、矩形を領域を塗りつぶすと、
 goを再帰する。
 このときシーケンスである引数rectsにマッチした牌rectを加えており、
 rectsはすべての牌についてのマッチングが終了した時には関数goの返り値となる。
 
-%疑問
-\begin{comment}
-・sortby(_._2.x)のxは何を指しているのか？
-・map(_._1)は何を実行しているのか？
-\end{comment}
+矩形領域がすべて塗りつぶされたあとは、
+適当な地点が最大スコアとして返り、そこからそのループでのrectが得られるが、
+intersectsによって現在のrectと過去のrect（rectsに保存）の矩形領域が重なっているか否かの判別を行い、
+重なっていた場合にマッチング終了という判定を下す。
 
-%疑問
-\begin{comment}
-\section{疑問点一覧}
-\begin{itemize}
-\item l63,indices.sizeについて、このカッコで囲んだ文一覧について
-\item groupByについて、mapValuesについて
-\item 
-\end{itemize}
-\end{comment}
+マッチングを終えたら結果を手牌の位置順にソートし、シーケンス情報だけを取り出しindicesに代入する。
+最後に純手牌か否かの判別を改めて行い、その結果とindicesのタプルをresultに代入していく。
+
+resultは純手牌および鳴牌のまとまり毎に要素数がひとつずつ増える構造であり、
+最終的に、純手牌と鳴牌のシーケンスのタプルがrecognizeの返り値となる。
 
 \section{matchTemplateについて}
 
@@ -388,7 +356,6 @@ matchTemplateの結果であるresultについては、スコアのマップ形�
 
 
 
-\begin{comment}
 \newpage
 
 \section{付録}
@@ -396,7 +363,6 @@ matchTemplateの結果であるresultについては、スコアのマップ形�
 \subsection{画像認識}
 \begin{lstlisting}[caption=TemplateMatching.scala,label=TemplateMatching]
 package mahjongs.recognizer
-
 import org.opencv.core._
 import org.opencv.imgproc.Imgproc
 
@@ -468,10 +434,8 @@ object TemplateMatching {
 \subsection{ユーザ定義関数}
 \begin{lstlisting}[caption=package.scala,label=package]
 package mahjongs
-
 import scala.collection.JavaConverters._
 import scala.collection.mutable.Buffer
-
 import org.opencv.core._
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
@@ -578,6 +542,5 @@ package object recognizer {
 
 }
 \end{lstlisting}
-\end{comment}
 
 \end{document}
