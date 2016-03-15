@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.5-130605-2.6 (utf8.sjis) (TeX Live 2014/W32TeX) (preloaded format=platex 2014.5.8)  10 MAR 2016 09:54
+This is e-pTeX, Version 3.14159265-p3.5-130605-2.6 (utf8.sjis) (TeX Live 2014/W32TeX) (preloaded format=platex 2014.5.8)  15 MAR 2016 12:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -250,52 +250,95 @@ File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 131.
+File: ./img/template.png Graphic file (type bmp)
+ <./img/template.png>
+File: ./img/template_gray.png Graphic file (type bmp)
+
+<./img/template_gray.png>
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 143.
+(Font)              <7> on input line 165.
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 5.76599pt on input line 143.
+(Font)              scaled to size 5.76599pt on input line 165.
 
 
 Package multicol Warning: I moved some lines to the next page.
-(multicol)                Footnotes on page 2 might be wrong on input line 176.
+(multicol)                Footnotes on page 2 might be wrong on input line 173.
 
 
-[2] [3]
+[2]
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 215.
+LaTeX Font Info:    Try loading font information for OML+cmr on input line 222.
+
+ (c:/w32tex/share/texmf-dist/tex/latex/base/omlcmr.fd
+File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <9> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 222.
+ [3] [4] [5] [6]
+File: ./img/zero.png Graphic file (type bmp)
+
+<./img/zero.png>
+File: ./img/zeroRes.png Graphic file (type bmp)
+ <./img/zeroRes.png>
+File: ./img/template_contour.png Graphic file (type bmp)
+ <./img/template_contour.png>
+File: ./img/template_crop.png Graphic file (type bmp)
+
+<./img/template_crop.png> [7]
+File: ./img/template_binary.png Graphic file (type bmp)
+ <./img/template_binary.png>
+File: ./img/otsu.png Graphic file (type bmp)
+ <./img/otsu.png>
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 504.
+LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 504.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 504.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 9.60999pt on input line 504.
+
+
+LaTeX Warning: Reference `eq:sigma' on page 8 undefined on input line 504.
+
+[8]
+File: ./img/hand.png Graphic file (type bmp)
+ <./img/hand.png> [9]
 File: ./img/ccorr.png Graphic file (type bmp)
  <./img/ccorr.png>
-Overfull \hbox (10.90515pt too wide) in paragraph at lines 278--286
+Overfull \hbox (10.90515pt too wide) in paragraph at lines 621--629
 []\JY1/mc/m/n/10 プログラムでは \OT1/cmr/m/n/10 method \JY1/mc/m/n/10 に \OT1/c
 mr/m/n/10 TM[]CCORR[]NORMED
  []
 
-[4]
+[10]
 File: ./img/res.png Graphic file (type bmp)
  <./img/res.png>
 File: ./img/res2.png Graphic file (type bmp)
- <./img/res2.png> [5] [6]
+ <./img/res2.png> [11]
+Overfull \hbox (99.66692pt too wide) in paragraph at lines 699--701
+[]\OT1/cmr/m/n/10 https://github.com/Itseez/opencv/blob/d8c352d20d2dba96298c26b
+92b7919e98e47c4c3/modules/imgproc/src/contours.cpp 
+ []
+
+[12]
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 363.
+(Font)              scaled to size 11.53198pt on input line 712.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 363.
-LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 369.
-LaTeX Font Info:    Try loading font information for OML+cmr on input line 375.
+(Font)              scaled to size 11.53198pt on input line 712.
+ [13] [14] [15] [16] (./mahjong-notes.aux)
 
+LaTeX Warning: There were undefined references.
 
-(c:/w32tex/share/texmf-dist/tex/latex/base/omlcmr.fd
-File: omlcmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <9> not available
-(Font)              Font shape `OML/cmm/m/it' tried instead on input line 375.
- [7] [8] [9] [10]
-(./mahjong-notes.aux) ) 
+ ) 
 Here is how much of TeX's memory you used:
- 2981 strings out of 493807
- 40425 string characters out of 6153780
- 291047 words of memory out of 5000000
- 6434 multiletter control sequences out of 15000+600000
- 15561 words of font info for 70 fonts, out of 8000000 for 9000
+ 3153 strings out of 493807
+ 42379 string characters out of 6153780
+ 308047 words of memory out of 5000000
+ 6596 multiletter control sequences out of 15000+600000
+ 16150 words of font info for 73 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 27i,8n,49p,210b,1638s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 27i,10n,49p,239b,1676s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on mahjong-notes.dvi (10 pages, 81796 bytes).
+Output written on mahjong-notes.dvi (16 pages, 155824 bytes).

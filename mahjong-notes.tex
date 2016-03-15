@@ -93,7 +93,7 @@ mahjongs/recogniser/lib
 \section{画像認識のフロー}
 
 画像認識はパターンマッチングによって行われている。
-よって、最初に訓練データからテンプレートを生成し、その後テストデータとテンプレートを照合させて結果を求める。
+よって、最初にテンプレートを生成し、その後テストデータとテンプレートを照合させて結果を求める。
 まずはテンプレートの生成手順を示す。
 \begin{enumerate}
 \item 雀牌を黒と白で二値化する
@@ -139,7 +139,29 @@ mahjongs/recogniser/lib
 背景には麻雀マットなどを用いれば良い。
 また斜めから撮影された画像からは正しいテンプレートが得られないことに気を付ける。
 
-元画像はプログラムへMat型で渡される。
+実際に使用したテンプレート画像を図\ref{fig:template}に示す。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/template.png}
+    \caption{テンプレート}
+    \label{fig:template}
+  \end{center}
+\end{figure}
+
+この画像の画素値は幅680x高さ396ピクセルであり、
+ビットの深さは32である。
+このビット数はグレースケール変換後（図\ref{fig:templateGray}）には8ビットまで圧縮される。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/template_gray.png}
+    \caption{テンプレート\ グレースケール}
+    \label{fig:templateGray}
+  \end{center}
+\end{figure}
+
+元画像は図\ref{fig:templateGray}の状態に変換された後にプログラムへMat型で渡される。
 Mat型はopencv\footnote{https://github.com/bytedeco/javacv}のライブラリが提供する行列の型であり、
 opencvではこの型で画像データを扱う。
 Mat型の内部構造は行列、画素値、画素のデータ型である。
@@ -161,20 +183,327 @@ warpAffineで矩形の傾きを底面と垂直になるよう修正し、
 getRectSubPixで矩形領域のピクセル値を得ることで、
 入力画像を輪郭毎に分離した上で補正をかけた画像を得るようになっている。
 
-白と黒で二値化されたテンプレート画像は、
-牌の集合の縁は白、背景は黒と別の色で分けられているため、
-findCountoursによって輪郭を得られるようになっている。
+輪郭を切り取る関数findContoursの理論を示す。
+\begin{enumerate}
+\item 二値化を行う
+\item 画素の左上から右下にかけて白の値を走査する
+\item 白の値が見つかれば、そこを基点と定める
+\item 基点に隣接する白の値を探し、見つかればそこを新たな基点として再帰的に輪郭を得る。
+		  見つからなければ孤立点または孤立線として捉え、輪郭を抽出できたとする
+\item 最初の基点と現在の基点が重なったときに、輪郭を抽出出来たとする
+\item すべての画素の走査が終了するまで２．～５．を繰り返す
+\end{enumerate}
+
+当プログラムでは最も高いヒエラルキーの輪郭のみを抽出しているため、処理が高速である。
+ヒエラルキーとはopencvの概念であり、輪郭の内部にまた別の輪郭がある場合、後者は前者の子だとして階層関係を定義しているのだが、
+ここでは子となるあらゆる輪郭を無視している。
+
+findContoursの実装についてはドキュメントに数式が散見されず、
+またソースコード（contours.cpp）が1700行にも上る\cite{contours}ため、
+解析は困難であった。
+代わりに上述の理論に基づいたアルゴリズムを自分で実装したので、
+そのようなアルゴリズムが使われていたのだと仮定することにする。
+実装したアルゴリズムを以下に示す。
+
+\end{multicols}
+
+\begin{lstlisting}[caption=輪郭抽出アルゴリズム,label=contour]
+import cv2
+
+class boader:
+
+  base = {"row": 0, "col": 0}
+  isolate = []
+
+  def threshold(self, img):
+    res = img
+    for y in range(len(img)):
+      for x in range(len(img[y])):
+        if img[y][x] >= 128:
+          buf = 255
+        else:
+          buf = 0
+        res[y][x] = buf
+    return res
+
+  def directions(self, n):
+    """
+    When recursiving, send index of direction.
+    Right-back direction is gotten by (n+4+1) % 8
+    """
+    if n==0:
+      direction = [[-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0]]
+    elif n==1:
+      direction = [[0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1]]
+    elif n==2:
+      direction = [[1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1]]
+    elif n==3:
+      direction = [[1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1]]
+    elif n==4:
+      direction = [[1,1], [0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0]]
+    elif n==5:
+      direction = [[0,1], [-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1]]
+    elif n==6:
+      direction = [[-1,1], [-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1]]
+    elif n==7:
+      direction = [[-1,0], [-1,-1], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,0]]
+    else:
+      print("directions catch undefined number as parameter:" + str(n))
+    return direction
+
+  def directionDecoder(self, y, x):
+    # getting forward direction
+    n = 0
+    if x==-1:
+      if y==-1: n = 0
+      elif y==0: n = 1
+      elif y==1: n = 2
+    elif x==0:
+      if y==-1: n = 7
+      elif y==1: n = 3
+    elif x==1:
+      if y==-1: n = 6
+      elif y==0: n = 5
+      elif y==1: n = 4
+    res = (n+5)%8
+    print("res:" + str(res) + ", y:" + str(y) + ", x:" + str(x))
+    return res
+
+  def recursiveSearch(self, img, row, col, contour, directionNum):
+    """
+    1. base-point is passed as parameter
+    2. search black-point using counterclockwise rotation.
+       start direction is right-back
+    3. if find black-point, deciding direction and recursiving and fill new black-point marker number "1". marker number is reseted on going to new base-point
+       if not find black-point, back previous point and search another point
+    4. if reach base-point, contour extraction is finished
+    """
+
+    # 8 direction (Northwest -> West -> ... -> North)
+    direction = self.directions(directionNum)
+    print("-" * 30)
+    print("row:" + str(row) + ", col:" + str(col))
+    print("directionNum:" + str(directionNum))
+    print("direction:")
+    print direction
+
+    for i in range(len(direction)-1):
+      y = row + direction[i][0]
+      x = col + direction[i][1]
+
+      # only permit number can be in index
+      if (y >= 0 and y < len(img)) and (x >= 0 and y < len(img[y])): 
+        if len(contour) > 30: #forcely finish(for debug)
+            b += 0
+        # if find black-point
+        if img[y][x]==0:
+          # if black-point is base-point
+          if y==self.base["row"] and x==self.base["col"]:
+            img[y][x] = 1 # fill
+            return (contour, True) # back to recursiving-parent
+          else:
+            newDirectionNum = self.directionDecoder(direction[i][0], direction[i][1])
+            img[y][x] = newDirectionNum+10 # fill (for duplication)
+            c = contour
+            c.append([y, x])
+            print("direction=>[y, x]:", str(direction[i][0]) + ", " + str(direction[i][1]))
+            res = self.recursiveSearch(img, y, x, c, newDirectionNum)
+            if res[1] == True:
+              self.isolate = [] # reset
+              return res # back to searchBoader
+
+    # if not found new black-point
+    """
+    1. traceback previous point
+    2. check new black-point(without deadend route)
+       deadend route is ignored by fill
+    3. if traceback reach base-point, this case is getting curve
+    4. in other case, when isolate curve is detected, use global variable "isolate" and assign deadend-contour. "isolate" is final variable, re-assignment is only permitted in end of recursiving for reset
+    """
+    if len(self.isolate) == 0:
+      self.isolate = contour
+    if len(self.isolate)==1 or row==self.base["row"] and col==self.base["col"] :
+      img[y][x] = 1 # fill
+      isl = self.isolate
+      self.isolate = []
+      return (isl, True) # back to recursiving-parent
+    c = contour[:-1]
+    res = self.recursiveSearch(img, contour[len(contour)-1][0], contour[len(contour)-1][1], c, 0) # in this case, black-point duplication is not found. then, directionNum is any value.
+    if res[1] == True:
+      self.isolate = []
+      return res
+
+    print("contour::False")
+    self.isolate = []
+    return (contour, False)
+
+  def searchBoader(self, img):
+    """search most external contour."""
+    res = []
+    img = b.threshold(img)
+    for y in range(len(img)):
+      for x in range(len(img[y])):
+        if img[y][x] == 0:
+          self.base["row"] = y
+          self.base["col"] = x
+          buf = self.recursiveSearch(img, y, x, [[y, x]], 0)
+          if buf[1]==True:
+            res.append(buf[0])
+            img = self.fill(img, buf[0])
+
+    self.show(img)
+    return res
+
+  def show(self, img):
+    print img
+
+  def fill(self, img, contour):
+    """
+    fill inner contour.
+    in case, fill make black pixel inner contoutr assign value of 2.
+    because black pixel referenced by searchBoader is only value of 0.
+    """
+    fillVal = 2
+    whiteVal = 255
+    flag = 0
+    for c in contour:
+      img[c[0]][c[1]] = fillVal
+    for y in range(len(img)):
+      prev = whiteVal # prev is used for detecting edge
+      for x in range(len(img[y])):
+        if not img[y][x] == prev:
+          if prev > img[y][x]: flag = 1
+          else: flag = 0
+        if flag == 1: img[y][x] = fillVal
+        prev = img[y][x]
+
+    return img
+
+
+b = boader()
+img = cv2.imread("zero.jpg", 0)
+res = b.searchBoader(cv2.resize(img, (10, 10)))
+print res
+\end{lstlisting}
+
+\begin{multicols}{2}
+
+このアルゴリズムでは次の基準点を探すときに方向を取得しており、
+移動方向から右斜め後ろにあたる点から反時計回りの順で画素の輝度を探索するようにしている。
+%内側の判定（複数の輪郭が重なるケース）が未完成のコード。最外殻のみ取れる
+
+このアルゴリズムについて図\ref{fig:zero}で実験を行ったところ、
+図\ref{fig:zeroRes}のような結果が得られた。
+出力されたリストを見れば、輪郭を抽出できていることがわかる。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=3.0cm]{./img/zero.png}
+    \caption{輪郭抽出実験\ 元画像}
+    \label{fig:zero}
+  \end{center}
+\end{figure}
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/zeroRes.png}
+    \caption{輪郭抽出実験\ 結果}
+    \label{fig:zeroRes}
+  \end{center}
+\end{figure}
+
+麻雀認識プログラムの輪郭抽出の話に戻るが、
+最終的に、図\ref{fig:templateContour}のように輪郭が取得される。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/template_contour.png}
+    \caption{テンプレート\ 輪郭}
+    \label{fig:templateContour}
+  \end{center}
+\end{figure}
+
+opencvの輪郭抽出メソッドfindCountoursから
 得た輪郭countourのメソッドtoArrayを用いれば、
-minAreaRectで矩形を引くべき座標を得られるのである。
+minAreaRectで矩形を引くべき座標を得られる。
 
 こうして得られた分離後の画像のシーケンス（返り値はBuffer型であることに注意）から
 headOptionを使うことで先頭要素を取り出せる。
-findContoursでは大きさ順に画像をソートする作用があるので、
+findContoursを呼び出した際に大きさ順に画像をソートしているので、
 先頭要素には一番大きな画像が入る。
 一番大きな画像が雀牌であるという前提であるなら、
 この先頭要素は雀牌であるため、雀牌のテンプレートは引数templateに束縛される。
+findCountersは複数の輪郭を検出できたとき、それらをまとめて返すため、このようにして雀牌を取り出す。
 
-thresholdによってテンプレートを黒と白で二値化し、
+以上の処理を行い輪郭抽出を終えた画像を図\ref{fig:templateCrop}に示す。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/template_crop.png}
+    \caption{テンプレート\ 輪郭抽出済}
+    \label{fig:templateCrop}
+  \end{center}
+\end{figure}
+
+得られた雀牌画像をthresholdによって黒と白で二値化すると、図\ref{fig:templateBinary}の様な画像になる。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/template_binary.png}
+    \caption{テンプレート\ 二値化}
+    \label{fig:templateBinary}
+  \end{center}
+\end{figure}
+
+ここでは模様が白、牌の白地が黒に分離されている。
+二値化処理では白地が白となるのが普通だが、ここでは二値化の後に反転をかけてあえて白地を黒、模様を白としている。
+これはopencvの輪郭抽出処理が黒を背景として切り捨てるため\cite{contoursDoc}であり、
+この後模様の輪郭抽出を行う際に模様を白くして抽出できるようにする。
+
+二値化の閾値は大津の二値化と呼ばれるアルゴリズムを用い、統計的に自動で算出する。
+大津の二値化について説明する。
+まず横軸に輝度、縦軸に画素数を取ったヒストグラム（図\ref{fig:otsu}）を画像データから生成する。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/otsu.png}
+    \caption{輝度－画素数のヒストグラム}
+    \label{fig:otsu}
+  \end{center}
+\end{figure}
+
+図中の赤い領域と青い領域をうまく分離できるような閾値（緑線）を探索することがこのアルゴリズムの目的である。
+
+閾値を評価する指数として、分離度という値を導入する。
+分離度はクラス内分散$σ_{w}$に反比例し、クラス間分散$σ_{b}$に比例する。
+$σ_{w}$、$σ_{b}$はそれぞれ以下の式で表される。
+
+\begin{eqnarray}
+\label{sigmaw}
+{ \sigma  }_{ w } & = & \frac { { w }_{ 1 }{{ \sigma  }_{ 1 }}^{2}+{ w }_{ 2 }{{ \sigma  }_{ 2 } }^{2}}{ { w }_{ 1 }+{ w }_{ 2 } } 
+\end{eqnarray}
+
+\begin{eqnarray}
+\label{sigmab}
+{ \sigma  }_{ b } & = & \frac { { w }_{ 1 }{{ \left( { m }_{ 1 }-{ m }_{ t } \right)  }}^{2}+{ w }_{ 2 }{\left( { m }_{ 2 }-{ m }_{ t } \right)}^{2}  }{ { w }_{ 1 }+{ w }_{ 2 } } 
+\end{eqnarray}
+
+クラス内分散とは各クラス（赤領域と青領域）についての分散を出し、各クラスのデータ数で重み付けをして求められる、
+各クラス毎のまとまりを包括的に示す指標である。
+
+一方クラス間分散とは全体の平均値と各クラスの平均値を使って求められる分散であり、
+これは各クラスがどれだけ散らばっているのかを示す指標である。
+
+最終的に分離度は、定数項を切り離して
+
+\begin{eqnarray}
+\label{sigma}
+\sigma = w_{1} w_{2}{\left(m_{1}-m_2 \right)}^{2}
+\end{eqnarray}
+
+によって示される。式\ref{eq:sigma}が最大となる閾値を求めればよい。
+輝度が8bitならば試行回数は256で済むので、総当りで探索しても差し支え無いだろう。
+
 widthとheightに牌ひとつあたりの幅と高さを代入する。
 このとき雀牌の並びが4*9でなかったとき、想定外の値を取ってしまうので注意すること。
 
@@ -216,6 +545,20 @@ gridで牌を4*9に区切り、zipで牌ごとに模様の輪郭の情報を付�
 
 照合は関数recognizeによって実装されている。
 この引数matに手牌の画像データを、templatesにテンプレートの画像データを渡す。
+
+実際に使用した手牌データを図\ref{fig:hand}に示す。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/hand.png}
+    \caption{手牌}
+    \label{fig:hand}
+  \end{center}
+\end{figure}
+
+この画像の画素値は幅959x高さ400ピクセルであり、
+ビットの深さは32ビットである。
+手牌の場合も二値化を施すと8ビットまで圧縮される。
 
 手牌のデータはcropによって背景から切り離される。
 しかしテンプレートをcropで切り離したときと違い、
@@ -352,6 +695,12 @@ matchTemplateの結果であるresultについては、スコアのマップ形�
 \bibitem{matchTemplatePy}
 	Object Detection－opencv2.4.10．\\
 	http://docs.opencv.org/2.4/modules/imgproc/doc/object\_detection.html
+\bibitem{contours}
+	opencv/contours.cpp－Itseez/opencv． \\
+	https://github.com/Itseez/opencv/blob/d8c352d20d2dba96298c26b92b7919e98e47c4c3/modules/imgproc/src/contours.cpp
+\bibitem{contoursDoc}
+   contours－OpenCV． \\
+   http://docs.opencv.org/3.1.0/d4/d73/tutorial\_py\_contours\_begin.html
 \end{thebibliography}
 
 
