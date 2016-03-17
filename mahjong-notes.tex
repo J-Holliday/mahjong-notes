@@ -99,7 +99,7 @@ mahjongs/recogniser/lib
 \item 雀牌を黒と白で二値化する
 \item 雀牌の輪郭を判別し、雀牌だけを切り取る
 \item 雀牌から牌ひとつあたりの縦幅と横幅を求める
-\item 白と判別された誤差（牌の隅）を黒く塗りつぶす
+\item 黒と判別された誤差（牌の隅）を白く塗りつぶす
 \item 牌の絵柄部分の輪郭情報を得る
 \item 輪郭情報と雀牌のグレースケール画像からテンプレートを生成する
 \end{enumerate}
@@ -544,7 +544,71 @@ floodFillとdilateをかけた結果の画像を図\ref{fig:templateFill}に示�
 四筒のように模様が複数に分離されてしまうケース（二筒ふたつとして認識される）の場合は、
 convexHullによって結合する。
 convexHullは点群の凸包を得た後に外接する矩形で近似する。
-最後に、得られた模様の中で、もっとも面積の大きなものをsizeに代入する。
+
+凸包の近似のアルゴリズムを示す。
+まずは基準点を決定する。
+この際基準点となりうる点は、凸包を形成する点でなくてはならないので、
+点集合の最も上部にある点を基準点とする。
+この点を求めるには、画像の左上から右下にかけて走査し、
+最初に当たった点を極地にある点だと見做せばよい。
+
+次に基準点を始点とする半直線（基準線）を置く。
+左上から右下への走査を行った場合は、画像に対し真上の方向か、それに左へ直角な基準線を考える。
+
+そして基準点からあらゆる他の点集合に対して直線を引き、
+その直線と基準線との角度の差が最も小さい点が、凸包を形成する点であると見なせる。
+
+後は再帰的にこれまでの処理を繰り返し、多角形が形成されれば凸包を求めることができる。
+
+%
+%sklansky法
+%
+\begin{comment}
+opencvのconvexHullはSklanskyのアルゴリズムによって凸法を求めている。
+そのアルゴリズムの流れを示す。
+
+まずは凸法を求めたい点集合を用意する。
+そして上下左右四方向の極地の点を取得し、点T,B,L,Rとする。
+点T,B,L,Rより四角形を作り、その四角形に外接する矩形を描く（図\ref{fig:sklansky1}）。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/sklansky1.png}
+    \caption{Sklansky法－外接矩形の作成}
+    \label{fig:sklansky1}
+	 {\tiny http://cgm.cs.mcgill.ca/~athens/cs601/}
+  \end{center}
+\end{figure}
+
+R1領域について考える。
+Lを凸包の頂点Iとし、
+Iを始点とする直線上に凸包の頂点I+1を置くと、それはR1領域を図（\ref{fig:sklansky2}）のように分割する。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/sklansky2.png}
+    \caption{Sklansky法－R1領域の分割}
+    \label{fig:sklansky2}
+	 {\tiny http://cgm.cs.mcgill.ca/~athens/cs601/}
+  \end{center}
+\end{figure}
+
+次に頂点I+2を置くことを試みるのだが、条件によってその挙動が決まる。
+\begin{enumerate}
+\item I+2がR1領域に存在しない場合は、I+2を廃棄する。
+\item I+2がA3領域に存在する場合は、I+2を保持し、次の処理に移る。
+\item I+2がA2領域に存在するか、
+        I+2がA1領域にありかつI+2がI+1の上にあり更に直前の点がこの処理によって廃棄されていた場合は、I+2を廃棄する。
+\item I+2がA1領域に存在する場合は、I+1を廃棄する。
+\end{enumerate}
+
+(3)の処理を行った場合は、I+2をI+1とし、I+1をIとする。
+それ以外の場合はIをひとつ進め、
+
+\end{comment}
+
+凸包から話を戻す。
+得られた模様の中で、もっとも面積の大きなものをsizeに代入する。
 マッチングを行う際にはこのサイズを基準にするためである。
 
 ここまでで二値化を通して牌の模様の輪郭情報を抽出する処理を行った。
@@ -581,10 +645,39 @@ gridで牌を4*9に区切り、zipで牌ごとに模様の輪郭の情報を付�
 しかしテンプレートをcropで切り離したときと違い、
 この場合は牌のデータが複数に分かれる。
 手牌には純手牌と鳴牌があり、鳴牌は純手牌と離して置くためだ。
+この時の出力結果は以下のようになる。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=5.0cm]{./img/hand0_0.png}
+    \caption{手牌 分離後 1}
+    \label{fig:hand0}
+    \includegraphics[clip,width=5.0cm]{./img/hand1_0.png}
+    \caption{手牌 分離後 2}
+    \label{fig:hand1}
+    \includegraphics[clip,width=4.0cm]{./img/hand2_0.png}
+    \caption{手牌 分離後 3}
+    \label{fig:hand2}
+    \includegraphics[clip,width=4.0cm]{./img/hand3_0.png}
+    \caption{手牌 分離後 4}
+    \label{fig:hand3}
+    \includegraphics[clip,width=3.0cm]{./img/hand4_0.png}
+    \caption{手牌 分離後 5}
+    \label{fig:hand4}
+  \end{center}
+\end{figure}
+
+図のデータの順は、配列変数内の順に一致する。
+その順は画像データの面積によって決められており、
+分離時に得た輪郭を利用して領域内の面積を求めている。
+
+面積を求めるには、まず輪郭情報から四方向（上下左右）の極地点を取得し、
+次に各極値が持つ座標情報から輪郭に外接する矩形を求め、
+その長辺と短辺を掛けあわせれば良い。
 
 手牌のデータはcollectによってhandに束縛される。
-handをテンプレートのサイズに合わせてリサイズし、
-頂点数を求め純手牌か否かの情報をedgeに代入して、
+まずはhandをテンプレートのサイズに合わせてリサイズする。
+それから頂点数を求め純手牌か否かの情報をedgeに代入して、
 テンプレートに向きを回転させた牌を加えてtilesに代入すると、
 いよいよgoでパターンマッチを行う。
 	
@@ -596,6 +689,24 @@ minMaxLocを通して最高スコアと最低スコアの情報を取り出し�
 minMaxLocの返り値はドキュメントによると\cite{minMaxLoc}
 Core.MinMaxLocResult型である。
 座標を返すmaxLocフィールドと値を返すmaxValフィールドを参照することで最高スコアの情報を得ることができる。
+
+マッチングの結果はは図\ref{fig:result10}のような形で得られる。
+結果の画素はテンプレートと比較対象の画素の差であり、白い部分ほどスコアが高いことを意味している。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=7.0cm]{./img/matching_result1_0.png}
+    \caption{マッチング結果}
+    \label{fig:result10}
+    \includegraphics[clip,width=1.0cm]{./img/9wan.png}
+    \caption{テンプレート}
+    \label{fig:9wan}
+  \end{center}
+\end{figure}
+
+図\ref{fig:result10}の結果は図\ref{fig:hand1}に対して九萬のテンプレート（図\ref{fig:9wan}）でマッチングを行った結果である。
+左端と右端、それから「マッチング結果」の「果」の上にあたる部分で白い点のようなものが見えるが、
+この三点こそ縦向きの九萬が発見された点を示している。
 
 すべてのテンプレート（及びその回転）に対してのマッチングの結果locsから、
 loc値が最大となるものをmaxByによって取得し、変数((tile,loc),i)に代入する。
@@ -609,10 +720,26 @@ goの引数はrectsであり、
 それはrectと、そのインデックス番号のタプルのシーケンスである。
 goは再帰を前提としており、このシーケンスrectsは再帰のたびに認識結果を積み重ねてゆく。
 
-rectangleによってマッチングした牌の輪郭部分に矩形を描き、矩形を領域を塗りつぶすと、
+rectangleによってマッチングした牌の輪郭部分に矩形を描き、矩形内部の領域を塗りつぶすと、
 goを再帰する。
 このときシーケンスである引数rectsにマッチした牌rectを加えており、
 rectsはすべての牌についてのマッチングが終了した時には関数goの返り値となる。
+
+矩形を引いた結果を図\ref{fig:rect11}に、塗りつぶした結果を図\ref{fig:hand11}に示す。
+
+\begin{figure}[H]
+  \begin{center}
+    \includegraphics[clip,width=5.0cm]{./img/hand_rect1_1.png}
+    \caption{矩形描画}
+    \label{fig:rect11}
+    \includegraphics[clip,width=5.0cm]{./img/hand1_1.png}
+    \caption{塗りつぶし後}
+    \label{fig:hand11}
+  \end{center}
+\end{figure}
+
+このように塗りつぶされた箇所は、以後の再帰でのマッチングにおいて、
+テンプレートにマッチしなくなる。
 
 矩形領域がすべて塗りつぶされたあとは、
 適当な地点が最大スコアとして返り、そこからそのループでのrectが得られるが、
@@ -637,6 +764,7 @@ opencvにおけるテンプレートマッチングを行うメソッドmatchTem
 
 プログラムではmethodにTM\_CCORR\_NORMEDを指定している。
 これは数式で表すと
+\\ \\ 
 \begin{figure}[H]
   \begin{center}
     \includegraphics[clip,width=7.0cm]{./img/ccorr.png}
@@ -645,10 +773,16 @@ opencvにおけるテンプレートマッチングを行うメソッドmatchTem
   \end{center}
 \end{figure}
 であり、一般に相互相関関数と呼ばれる式である。
+なおw(T)はTの横の画素数を、h(T)はTの縦の画素数を指す。
 
-この式の意味するところは、テンプレートと対象画像の内積である。
-相互相関関数の式の左辺をcosθに、右辺を内積とゲインの商だと見れば、
-まさしくベクトルの内積を示していることがわかる。
+この式の意味するところは、テンプレートと対象画像の畳込み演算である。
+ふたつのベクトル（または関数）に対しての畳込み演算は、
+積の総和によって求められる。これを相関と言うが、この値が大きければ大きいほど、正の相関度が高いと言える。
+
+相関について別の見方をすると、ベクトルの内積である。
+これを逆手に取って、各ベクトルの大きさの積で割ることによって、
+cosθだけを得られるようになる。
+$-1\le cos\theta \le 1$より、相関結果にスカラ値の割り算を施すと、-1から1の範囲で正規化される。
 相互相関関数の左辺は内積の角度cosθを示しており、
 cosθが１に近づけば近づくほど、θは小さく、テンプレートと対象画像の領域が近づいていることを意味する。
 
@@ -667,29 +801,11 @@ matchTemplateの結果であるresultについては、スコアのマップ形�
 この範囲の行列をマップと呼ぶ。（この呼び名はopencvのドキュメント\cite{matchTemplateC}\cite{matchTemplatePy}に即する）
 そしてマップの値にはテンプレートマッチングのスコア（相互相関関数の値）が入るのである。
 
-この理論は実際に画像を用意してmatchTemplateを行い、元画像・テンプレート画像のサイズとマップのサイズを比較すれば裏付けられる。
-マップのサイズは縦横ともに元画像とテンプレート画像の差に等しい結果が得られる。
-そしてこの結果を画像形式に落とし込んだものが、吉田さんの梗概集の図5に示されたマッチング結果である。
-マップの値たる相互相関関数の結果は、0から1の範囲で表されているため、
-そのままopencvの出力関数を使うと一面真っ黒な画像（図\ref{fig:res}）が得られてしまうが、
-255を乗ずることで、opencv標準の0から255までの範囲での画素の表現に対応するようになるため、
-吉田さんのマッチング結果のような、縞模様状の結果（図\ref{fig:res2}）を得ることができる。
-
-\begin{figure}[H]
-  \begin{center}
-    \includegraphics[clip,width=7.0cm]{./img/res.png}
-    \caption{相互相関関数出力結果1}
-    \label{fig:res}
-  \end{center}
-\end{figure}
-
-\begin{figure}[H]
-  \begin{center}
-    \includegraphics[clip,width=7.0cm]{./img/res2.png}
-    \caption{相互相関関数出力結果2}
-    \label{fig:res2}
-  \end{center}
-\end{figure}
+差の範囲でのみ比較を行うという性質上、テンプレートと対象画像のサイズ差が小さい場合は、
+非常に小さい計算量で済むという特徴がある。
+テンプレートマッチングの結果である図\ref{fig:result10}を見ると、
+横長の帯状の結果が得られているが、
+これは図\ref{fig:hand1}の対象画像に対して、図\ref{fig:result10}の範囲のみマッチングを行ったという証左である。
 
 %\begin{lstlisting}[caption=,label=]
 %
